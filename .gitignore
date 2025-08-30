@@ -1,0 +1,20 @@
+# Ignore pem keys
+*.pem
+
+# Logs
+*.log
+logs/
+*.json
+
+# Terraform local files
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Docker stuff
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
