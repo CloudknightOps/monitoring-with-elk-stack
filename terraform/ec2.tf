@@ -37,7 +37,7 @@ resource "aws_instance" "agent_node" {
   count         = var.number_of_agent_nodes
   vpc_security_group_ids = [aws_security_group.sg_main.id]
   subnet_id              = element([aws_subnet.aws_rke2_public_subnet1.id, aws_subnet.aws_rke2_public_subnet2.id], count.index % 2)
-  associate_public_ip_address = false  
+  associate_public_ip_address = true
   iam_instance_profile   = aws_iam_instance_profile.aws_iam_profile_worker.name
   key_name               = var.key_pair_name
   depends_on             = [aws_instance.master_server]
