@@ -1,11 +1,12 @@
 ### Required Variables
 variable "region" {
   type        = string
+  default = "us-east-1"
   description = "(Required) The AWS Region to use for the instance(s)."
 }
-
 variable "key_pair_name" {
   type        = string
+  default = "elk-key"
   description = "(Required) The AWS Key Pair name to use for the instance(s)."
 }
 
@@ -47,7 +48,7 @@ variable "public_subnet_cidr_blocks" {
 
 ### Instance Variables
 variable "master_server" {
-  default     = "t3.small"
+  default     = "m7i-flex.large"
   type        = string
   description = "(Optional) The AWS Instance type to use for the master node."
 }
@@ -55,7 +56,7 @@ variable "master_server" {
 variable "agent_node" {
   default     = "t3.small"
   type        = string
-  description = "(Optional) The AWS Instance type to use for the worker nodes."
+  description = "(Optional) The AWS Instance type to use for the agent nodes."
 }
 
 variable "elk_node_instance_type" {
@@ -72,7 +73,7 @@ variable "number_of_agent_nodes" {
 
 ### Storage Variables
 variable "volume_size_master" {
-  default     = 20
+  default     = 128
   type        = number
   description = "(Optional) The AWS Volume Size to use for the master node."
 }

@@ -111,24 +111,13 @@ resource "aws_vpc_security_group_ingress_rule" "elk_allow_5601_ipv4" {
   to_port           = 5601
 }
 
-
-# Allow Logstash Beats (5044) only from k8s worker subnets
 resource "aws_vpc_security_group_ingress_rule" "elk_allow_5044_workers" {
   security_group_id = aws_security_group.sg_elk.id
-  cidr_ipv4         = var.public_subnet_cidr_blocks[0] # subnet 1
+  cidr_ipv4         =  "0.0.0.0/0"
   from_port         = 5044
   ip_protocol       = "tcp"
   to_port           = 5044
 }
-
-resource "aws_vpc_security_group_ingress_rule" "elk_allow_5044_workers_2" {
-  security_group_id = aws_security_group.sg_elk.id
-  cidr_ipv4         = var.public_subnet_cidr_blocks[1] # subnet 2
-  from_port         = 5044
-  ip_protocol       = "tcp"
-  to_port           = 5044
-}
-
 
 # Allow all outbound traffic
 resource "aws_vpc_security_group_egress_rule" "elk_allow_all_outbound" {
