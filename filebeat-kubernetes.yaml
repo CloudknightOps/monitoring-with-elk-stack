@@ -131,7 +131,6 @@ data:
                 logs_path: "/var/log/containers/"
 
     processors:
-      - add_cloud_metadata:
       - add_host_metadata:
       - drop_event:
           when:
