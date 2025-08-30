@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -35,7 +36,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: filebeat
-  # should be the namespace where filebeat is running
   namespace: kube-system
   labels:
     k8s-app: filebeat
@@ -130,29 +130,15 @@ data:
             - logs_path:
                 logs_path: "/var/log/containers/"
 
-    # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
-    # filebeat.autodiscover:
-    #  providers:
-    #    - type: kubernetes
-    #      node: ${NODE_NAME}
-    #      hints.enabled: true
-    #      hints.default_config:
-    #        type: filestream
-    #        id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
-    #        paths:
-    #        - /var/log/containers/*-${data.kubernetes.container.id}.log
-    #        parsers:
-    #        - container: ~
-    #        prospector:
-    #         scanner:
-    #           fingerprint.enabled: true
-    #           symlinks: true
-    #        file_identity.fingerprint: ~
-
     processors:
       - add_cloud_metadata:
       - add_host_metadata:
-    
+      - drop_event:
+          when:
+            not:
+              equals:
+                kubernetes.namespace: "default"
+
     output.logstash:
       hosts: ["ip-10-0-20-178.ec2.internal:5044"]
 
@@ -191,8 +177,6 @@ spec:
               fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
-          # If using Red Hat OpenShift uncomment this:
-          #privileged: true
         resources:
           limits:
             memory: 200Mi
@@ -206,9 +190,6 @@ spec:
           subPath: filebeat.yml
         - name: data
           mountPath: /usr/share/filebeat/data
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
         - name: varlog
           mountPath: /var/log
           readOnly: true
@@ -217,16 +198,10 @@ spec:
         configMap:
           defaultMode: 0640
           name: filebeat-config
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
       - name: varlog
         hostPath:
           path: /var/log
-      # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
         hostPath:
-          # When filebeat runs as non-root user, this directory needs to be writable by group (g+w).
           path: /var/lib/filebeat-data
           type: DirectoryOrCreate
----
